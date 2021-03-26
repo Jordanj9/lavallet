@@ -25,9 +25,7 @@ class VehiculoGetAllController extends Controller
     public function __invoke(Request $request)
     {
         $vehiculos = $this->service->__invoke();
-
         $length =  count($vehiculos);
-
         if(isset($request->limit) && isset($request->offset)){
             $vehiculos = Utils::take($vehiculos,$request->limit,$request->offset);
         }else if(isset($request->limit)) {
