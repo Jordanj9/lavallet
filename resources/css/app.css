@@ -1,0 +1,17 @@
+@tailwind base;
+
+.active {
+    @apply border-b-2 border-green-600
+}
+
+body{
+    background-color: rgb(240, 240, 240);
+}
+
+*[disabled]{
+    opacity: .5;
+}
+
+@tailwind components;
+
+@tailwind utilities;
