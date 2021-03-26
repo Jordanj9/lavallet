@@ -63034,9 +63034,10 @@ var ListClientes = function () {
         react_1.default.createElement(modal_cliente_1.default, { show: show, hidden: hiddenModal, cliente: cliente, setCliente: setCliente, service: service }),
         react_1.default.createElement(modal_cliente_eliminar_1.default, { show: showEliminar, hidden: hiddenModal, id: id, service: service }),
         react_1.default.createElement("div", { className: 'flex justify-end' },
-            react_1.default.createElement("button", { onClick: function () { showModal(); }, className: 'p-2 px-4 inline-flex text-xs leading-5 font-semibold rounded-lg text-green-50', style: { backgroundColor: '#45BF55' } },
+            react_1.default.createElement("button", { onClick: function () { showModal(); }, className: 'p-2 px-4 inline-flex text-xs leading-5 font-bold rounded-lg text-green-50', style: { backgroundColor: '#45BF55' } },
                 react_1.default.createElement("svg", { className: 'w-6 h-6 text-white-500', xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" },
-                    react_1.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M12 6v6m0 0v6m0-6h6m-6 0H6" }))))));
+                    react_1.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M12 6v6m0 0v6m0-6h6m-6 0H6" })),
+                react_1.default.createElement("span", { className: "ml-2" }, "Agregar")))));
 };
 exports.default = ListClientes;
 
