@@ -33,7 +33,6 @@ const ListConductor: React.FC = () => {
     });
   },[show, showEliminar, pagina]);
 
-
   function showModalEliminar(id:string) : void {
     setId(id);
     setShowEliminar(true);
