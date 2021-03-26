@@ -13,10 +13,6 @@ class GenerarContratoPostController extends Controller
 
     private GuardarContratoService $service;
 
-    /**
-     * GenerarContratoPostController constructor.
-     * @param GuardarContratoService $service
-     */
     public function __construct(GuardarContratoService $service)
     {
         $this->service = $service;
