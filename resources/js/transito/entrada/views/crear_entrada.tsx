@@ -19,6 +19,8 @@ import Spinner from "../../shared/views/spinner";
 import axios from 'axios'
 import ReactDOM from "react-dom";
 
+
+
 let pc:RTCPeerConnection;
 let videoRef:any;
 
@@ -35,6 +37,7 @@ let doSignaling = (iceRestart:any) => {
         .then(res => {pc.setRemoteDescription(res); console.log(res)})
         .catch(alert)
 }
+
 const CrearEntrada: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
@@ -62,6 +65,7 @@ const CrearEntrada: React.FC = () => {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
+
     pc = new RTCPeerConnection()
     pc.addTransceiver('video')
 
@@ -76,6 +80,7 @@ const CrearEntrada: React.FC = () => {
         videoRef.srcObject=event.streams[0];
     }
     doSignaling(false);
+
     setContratos([]);
     if(pista != ""){
       setLoading(true);
