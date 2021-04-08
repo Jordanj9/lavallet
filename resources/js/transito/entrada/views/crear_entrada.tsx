@@ -16,15 +16,33 @@ import ContratoService from "../../contrato/application/ContratoService";
 import Preview from "../../shared/views/preview";
 import { Imprimible } from "../../salida/domain/imprimible";
 import Spinner from "../../shared/views/spinner";
+import axios from 'axios'
+import ReactDOM from "react-dom";
 
+let pc:RTCPeerConnection;
+let videoRef:any;
+
+let doSignaling = (iceRestart:any) => {
+    console.log({iceRestart});
+    pc.createOffer({iceRestart})
+        .then(offer => {
+            console.log(JSON.stringify(offer));
+            pc.setLocalDescription(offer);
+            return axios.post(`http://localhost:8080/doSignaling`,JSON.stringify(offer)
+          );
+        })
+        .then(res => res.data)
+        .then(res => {pc.setRemoteDescription(res); console.log(res)})
+        .catch(alert)
+}
 const CrearEntrada: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
-  
+
   const ticketService  = new TicketService();
-  const valeService  = new ValeService(); 
+  const valeService  = new ValeService();
   const contratoService = new ContratoService();
-  
+
   const [object, setObject] = useState<Ticket|Vale>({} as Ticket);
   const [isTicket, setIsTicket] = useState(false);
   const [showPreview, setPreview] = useState(false);
@@ -32,26 +50,40 @@ const CrearEntrada: React.FC = () => {
   const [pista, setPista] = useState('');
   const [imprimible, setImprimible] = useState<Imprimible>(new Imprimible());
   const [imprimir, setImprimir] = useState(false);
-  
+
   const [contrato, setContrato] = useState<Contrato>(new Contrato());
   const [contratos, setContratos] = useState<Contrato[]>([]);
   const [detalle, setDetalle] = useState<Detalle>(new Detalle());
   const [vehiculo, setVehiculo] = useState<VehiculoDTO>(new VehiculoDTO());
-  
+
   const [showModal, setShowModal] = useState(false);
   const [warning, setWarning] = useState(false);
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
 
   useEffect(() => {
+    pc = new RTCPeerConnection()
+    pc.addTransceiver('video')
+
+    pc.oniceconnectionstatechange = () => console.log(pc.iceConnectionState);
+    pc.ontrack = function (event) {
+        let el =document.createElement('video') as HTMLVideoElement;
+        el.srcObject = event.streams[0];
+        el.autoplay = true
+        el.controls = true;
+        const rootElement = document.getElementById("remoteVideos");
+        ReactDOM.render(<video ref={audio => {videoRef = audio}} controls={true} autoPlay={true} style={{height:200}}></video>, rootElement);
+        videoRef.srcObject=event.streams[0];
+    }
+    doSignaling(false);
     setContratos([]);
     if(pista != ""){
       setLoading(true);
-      contratoService.getByPlaca(pista).then( 
+      contratoService.getByPlaca(pista).then(
         value => {
           if(value.data != null){
-            setContratos(value.data);  
-            if(value.data.length > 0){            
+            setContratos(value.data);
+            if(value.data.length > 0){
               if(setVehiculo)
                 setVehiculo(new VehiculoDTO().setVehiculo(value.data[0].vehiculos[0]));
             }
@@ -68,7 +100,7 @@ const CrearEntrada: React.FC = () => {
       );
     }
   }, [pista]);
-  
+
   function showModalResponse(title:string, message:string, warning:boolean): void {
     setTitle(title);
     setMessage(message);
@@ -88,7 +120,7 @@ const CrearEntrada: React.FC = () => {
   }
 
   function showDetalleView(_contrato:Contrato) {
-    if(_contrato == contrato) 
+    if(_contrato == contrato)
       setContrato(new Contrato());
     else
       setContrato(_contrato);
@@ -102,7 +134,7 @@ const CrearEntrada: React.FC = () => {
     else
       setDetalle(_detalle);
   }
-  
+
   async function save(_object:any, _isTicket:boolean) {
     setLoading(true);
     if(_isTicket){
@@ -122,7 +154,7 @@ const CrearEntrada: React.FC = () => {
       );
     }
     else{
-      //GUARDAR VALE     
+      //GUARDAR VALE
       await valeService.save(_object).then(
         value => {
           if(value.data != null){
@@ -132,7 +164,7 @@ const CrearEntrada: React.FC = () => {
             setImprimir(true);
           }
           else
-            showModalResponse('Proceso fallido',value.mensaje, true);            
+            showModalResponse('Proceso fallido',value.mensaje, true);
           setLoading(false);
         }
       );
@@ -220,12 +252,12 @@ const CrearEntrada: React.FC = () => {
                       <div className="w-3/4">
                         <div className="mx-4 mt-6 mb-4">
                           <div className="">
-                            <input 
-                              onChange={handleChange} 
-                              style={{borderColor: errors.id ? 'red' : 'gainsboro'}} 
-                              name='id'  
-                              type="text" 
-                              placeholder="UWG-435" 
+                            <input
+                              onChange={handleChange}
+                              style={{borderColor: errors.id ? 'red' : 'gainsboro'}}
+                              name='id'
+                              type="text"
+                              placeholder="UWG-435"
                               className="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"/>
                           </div>
                         </div>
@@ -238,16 +270,16 @@ const CrearEntrada: React.FC = () => {
                               type="submit"
                               className='mt-1 p-2 px-4 w-full inline-flex leading-5 rounded-lg text-green-50 justify-center'
                               style={{backgroundColor: '#45BF55'}}>
-                                <svg 
+                                <svg
                                   className="w-6 h-6 text-white-500"
-                                  xmlns="http://www.w3.org/2000/svg" 
-                                  fill="none" 
-                                  viewBox="0 0 24 24" 
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
                                   stroke="currentColor">
-                                  <path 
-                                    strokeLinecap="round" 
-                                    strokeLinejoin="round" 
-                                    strokeWidth={2} 
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
                             </button>
@@ -258,15 +290,15 @@ const CrearEntrada: React.FC = () => {
                     <div className="mx-4 mb-1 mt-4 flex">
                       <div className="w-1/2" style={{flexDirection: 'column'}}>
                         <p className="text-gray-700 text-center">Tipo</p>
-                        <p className="text-xl text-gray-700 mt-2 pl-2 text-center">{vehiculo.tipo || '?'}</p>  
+                        <p className="text-xl text-gray-700 mt-2 pl-2 text-center">{vehiculo.tipo || '?'}</p>
                       </div>
                       <div className="w-1/2" style={{flexDirection: 'column'}}>
                         <p className="text-gray-700 text-center">Capacidad</p>
-                        <p className="text-xl text-gray-700 mt-2 pl-2 text-center">{vehiculo.capacidad || '?'}</p>                        
+                        <p className="text-xl text-gray-700 mt-2 pl-2 text-center">{vehiculo.capacidad || '?'}</p>
                       </div>
                     </div>
-                  </div> 
-                </div>            
+                  </div>
+                </div>
               </div>
             </form>
           )}
@@ -276,38 +308,38 @@ const CrearEntrada: React.FC = () => {
           <div className='absolute -top-3.5 py-1 px-3 left-2 rounded-lg text-gray-100' style={{backgroundColor: '#45BF55'}}>Cámara
           </div>
           <div className='absolute -top-3.5 py-1 px-3 right-2 rounded-lg text-gray-100' style={{backgroundColor: '#45BF55'}}>
-            <svg 
+            <svg
               className="w-6 h-6 text-white-500"
-              xmlns="http://www.w3.org/2000/svg" 
-              fill="none" viewBox="0 0 24 24" 
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none" viewBox="0 0 24 24"
               stroke="currentColor">
-              <path strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
+              <path strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
             </svg>
           </div>
           <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div className="p-2 align-middle min-w-full sm:px-6 lg:px-8">
-              
-            </div> 
-          </div>            
+              <div id="remoteVideos"></div>
+            </div>
+          </div>
         </div>
       </div>
       <div className='mb-8 p-4 pt-8 col-span-3 bg-gray-50 rounded-lg relative' style={{zIndex:0}}>
         <div className='absolute -top-3.5 py-1 px-3 left-2 rounded-lg text-gray-100' style={{backgroundColor: '#45BF55'}}>Cotratos
         </div>
         <div className='absolute -top-3.5 py-1 px-3 right-2 rounded-lg text-gray-100' style={{backgroundColor: '#45BF55', display: contrato.id != "" ? 'block' : 'none'}}>
-          <svg 
+          <svg
             className="w-6 h-6 text-white-500"
-            xmlns="http://www.w3.org/2000/svg" 
-            fill="none" 
-            viewBox="0 0 24 24" 
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
             stroke="currentColor">
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
               d="M5 13l4 4L19 7" />
           </svg>
         </div>
@@ -317,21 +349,21 @@ const CrearEntrada: React.FC = () => {
         <div className='absolute -top-3.5 py-1 px-3 left-2 rounded-lg text-gray-100' style={{backgroundColor: '#45BF55'}}>Detalles
         </div>
         <div className='absolute -top-3.5 py-1 px-3 right-2 rounded-lg text-gray-100' style={{backgroundColor: '#45BF55', display: detalle.contrato_id != "" ? 'block' : 'none'}}>
-          <svg 
+          <svg
             className="w-6 h-6 text-white-500"
-            xmlns="http://www.w3.org/2000/svg" 
-            fill="none" 
-            viewBox="0 0 24 24" 
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
             stroke="currentColor">
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
               d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <ListarDetalles showThis={true} showMore={true} contrato={contrato} setDetalle={setDetalleId} selected={detalle}/>  
-      </div>   
+        <ListarDetalles showThis={true} showMore={true} contrato={contrato} setDetalle={setDetalleId} selected={detalle}/>
+      </div>
       <div className='col-span-3 my-4 flex justify-end'  style={{zIndex:0}}>
           <button onClick={() => { preview(); }}
             className='px-8 py-3 | mr-4 | inline-flex text-sm md: leading-5 font-semibold rounded-lg text-green-50'

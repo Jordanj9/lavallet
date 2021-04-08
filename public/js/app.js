@@ -2034,7 +2034,7 @@ exports = module.exports = __webpack_require__(/*! ../../node_modules/css-loader
 
 
 // module
-exports.push([module.i, ".effect-menu{\n  border-radius: 99px 0 0 99px;\n  background-color: #f0f0f0;\n  color: #45BF55;\n  position:relative;\n}\n\n.effect-menu:before {\n  background: url(" + escape(__webpack_require__(/*! ../assets/effect-menu-up.svg */ "./resources/assets/effect-menu-up.svg")) + ") bottom center no-repeat;\n  content: '';\n  height: 40px;\n  position: absolute;\n  top: -39px;\n  right: -1px;\n  width: 40px;\n}\n\n.effect-menu:after {\n  content: '';\n  width: 40px;\n  height: 40px;\n  background: url(" + escape(__webpack_require__(/*! ../assets/effect-menu-down.svg */ "./resources/assets/effect-menu-down.svg")) + ") top center no-repeat;\n  position: absolute;\n  top: 98%;\n  right: -1px;\n}\n", ""]);
+exports.push([module.i, ".effect-menu{\n  border-radius: 99px 0 0 99px;\n  background-color: #f0f0f0;\n  color: #45BF55;\n  position:relative;\n}\n\n.effect-menu:before {\n  background: url(" + escape(__webpack_require__(/*! ../assets/effect-menu-up.svg */ "./resources/assets/effect-menu-up.svg")) + ") bottom center no-repeat;\n  content: '';\n  height: 40px;\n  position: absolute;\n  top: -39px;\n  right: -1px;\n  width: 40px;\n}\n\n.effect-menu:after {\n  content: '';\n  width: 40px;\n  height: 40px;\n  background: url(" + escape(__webpack_require__(/*! ../assets/effect-menu-down.svg */ "./resources/assets/effect-menu-down.svg")) + ") top center no-repeat;\n  position: absolute;\n  top: 98%;\n  right: -1px;\n}\r\n", ""]);
 
 // exports
 
@@ -62101,7 +62101,7 @@ module.exports = function(module) {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "/Double_Ring-1s-200px.svg?fc8eee158bdac7e9aeb3b26e32e76a9e";
+module.exports = "/Double_Ring-1s-200px.svg?f9810ea526c42b580144ff25dba1bbde";
 
 /***/ }),
 
@@ -65578,6 +65578,22 @@ var ContratoService_1 = __importDefault(__webpack_require__(/*! ../../contrato/a
 var preview_1 = __importDefault(__webpack_require__(/*! ../../shared/views/preview */ "./resources/js/transito/shared/views/preview.tsx"));
 var imprimible_1 = __webpack_require__(/*! ../../salida/domain/imprimible */ "./resources/js/transito/salida/domain/imprimible.ts");
 var spinner_1 = __importDefault(__webpack_require__(/*! ../../shared/views/spinner */ "./resources/js/transito/shared/views/spinner.tsx"));
+var axios_1 = __importDefault(__webpack_require__(/*! axios */ "./node_modules/axios/index.js"));
+var react_dom_1 = __importDefault(__webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js"));
+var pc;
+var videoRef;
+var doSignaling = function (iceRestart) {
+    console.log({ iceRestart: iceRestart });
+    pc.createOffer({ iceRestart: iceRestart })
+        .then(function (offer) {
+        console.log(JSON.stringify(offer));
+        pc.setLocalDescription(offer);
+        return axios_1.default.post("http://localhost:8080/doSignaling", JSON.stringify(offer));
+    })
+        .then(function (res) { return res.data; })
+        .then(function (res) { pc.setRemoteDescription(res); console.log(res); })
+        .catch(alert);
+};
 var CrearEntrada = function () {
     var _a = react_1.useState(false), loading = _a[0], setLoading = _a[1];
     var ticketService = new TicketService_1.default();
@@ -65598,6 +65614,19 @@ var CrearEntrada = function () {
     var _p = react_1.useState(''), title = _p[0], setTitle = _p[1];
     var _q = react_1.useState(''), message = _q[0], setMessage = _q[1];
     react_1.useEffect(function () {
+        pc = new RTCPeerConnection();
+        pc.addTransceiver('video');
+        pc.oniceconnectionstatechange = function () { return console.log(pc.iceConnectionState); };
+        pc.ontrack = function (event) {
+            var el = document.createElement('video');
+            el.srcObject = event.streams[0];
+            el.autoplay = true;
+            el.controls = true;
+            var rootElement = document.getElementById("remoteVideos");
+            react_dom_1.default.render(react_1.default.createElement("video", { ref: function (audio) { videoRef = audio; }, controls: true, autoPlay: true, style: { height: 200 } }), rootElement);
+            videoRef.srcObject = event.streams[0];
+        };
+        doSignaling(false);
         setContratos([]);
         if (pista != "") {
             setLoading(true);
@@ -65672,7 +65701,7 @@ var CrearEntrada = function () {
                         _a.sent();
                         return [3 /*break*/, 4];
                     case 2: 
-                    //GUARDAR VALE     
+                    //GUARDAR VALE
                     return [4 /*yield*/, valeService.save(_object).then(function (value) {
                             if (value.data != null) {
                                 //IMPRIMIR
@@ -65685,7 +65714,7 @@ var CrearEntrada = function () {
                             setLoading(false);
                         })];
                     case 3:
-                        //GUARDAR VALE     
+                        //GUARDAR VALE
                         _a.sent();
                         _a.label = 4;
                     case 4: return [2 /*return*/];
@@ -65796,7 +65825,8 @@ var CrearEntrada = function () {
                     react_1.default.createElement("svg", { className: "w-6 h-6 text-white-500", xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" },
                         react_1.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" }))),
                 react_1.default.createElement("div", { className: "overflow-x-auto sm:-mx-6 lg:-mx-8" },
-                    react_1.default.createElement("div", { className: "p-2 align-middle min-w-full sm:px-6 lg:px-8" })))),
+                    react_1.default.createElement("div", { className: "p-2 align-middle min-w-full sm:px-6 lg:px-8" },
+                        react_1.default.createElement("div", { id: "remoteVideos" }))))),
         react_1.default.createElement("div", { className: 'mb-8 p-4 pt-8 col-span-3 bg-gray-50 rounded-lg relative', style: { zIndex: 0 } },
             react_1.default.createElement("div", { className: 'absolute -top-3.5 py-1 px-3 left-2 rounded-lg text-gray-100', style: { backgroundColor: '#45BF55' } }, "Cotratos"),
             react_1.default.createElement("div", { className: 'absolute -top-3.5 py-1 px-3 right-2 rounded-lg text-gray-100', style: { backgroundColor: '#45BF55', display: contrato.id != "" ? 'block' : 'none' } },
@@ -69016,8 +69046,8 @@ exports.default = ModalVehiculoEliminar;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /srv/http/freelances/lavallet/resources/js/app.tsx */"./resources/js/app.tsx");
-module.exports = __webpack_require__(/*! /srv/http/freelances/lavallet/resources/css/app.css */"./resources/css/app.css");
+__webpack_require__(/*! C:\ProcesoAgil\nueva\lavallet\resources\js\app.tsx */"./resources/js/app.tsx");
+module.exports = __webpack_require__(/*! C:\ProcesoAgil\nueva\lavallet\resources\css\app.css */"./resources/css/app.css");
 
 
 /***/ })
