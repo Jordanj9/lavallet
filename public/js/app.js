@@ -65826,7 +65826,11 @@ var CrearEntrada = function () {
                         react_1.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" }))),
                 react_1.default.createElement("div", { className: "overflow-x-auto sm:-mx-6 lg:-mx-8" },
                     react_1.default.createElement("div", { className: "p-2 align-middle min-w-full sm:px-6 lg:px-8" },
-                        react_1.default.createElement("div", { id: "remoteVideos" }))))),
+                        react_1.default.createElement("div", { style: {
+                                position: 'absolute', left: '50%', top: '50%',
+                                transform: 'translate(-50%, -50%)'
+                            } },
+                            react_1.default.createElement("div", { id: "remoteVideos" })))))),
         react_1.default.createElement("div", { className: 'mb-8 p-4 pt-8 col-span-3 bg-gray-50 rounded-lg relative', style: { zIndex: 0 } },
             react_1.default.createElement("div", { className: 'absolute -top-3.5 py-1 px-3 left-2 rounded-lg text-gray-100', style: { backgroundColor: '#45BF55' } }, "Cotratos"),
             react_1.default.createElement("div", { className: 'absolute -top-3.5 py-1 px-3 right-2 rounded-lg text-gray-100', style: { backgroundColor: '#45BF55', display: contrato.id != "" ? 'block' : 'none' } },

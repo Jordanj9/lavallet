@@ -326,7 +326,16 @@ const CrearEntrada: React.FC = () => {
           </div>
           <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div className="p-2 align-middle min-w-full sm:px-6 lg:px-8">
+            <div
+              style={{
+                  position: 'absolute', left: '50%', top: '50%',
+                  transform: 'translate(-50%, -50%)'
+              }}
+              >
               <div id="remoteVideos"></div>
+            </div>
+
+
             </div>
           </div>
         </div>
