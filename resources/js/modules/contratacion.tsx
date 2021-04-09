@@ -8,7 +8,6 @@ import CrearContratos from '../transito/contrato/views/crear_contrato';
 import ListarContratos from "../transito/contrato/views/list_contrato";
 
 const Contratacion = () => {
-
     return (
       <React.Fragment>
         <div className='py-2 px-8'>
