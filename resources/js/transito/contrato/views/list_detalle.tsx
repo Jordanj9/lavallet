@@ -25,9 +25,13 @@ const ListarDetalles: React.FC<{
   const [detalles, setDetalles] = useState<Detalle[]>([]);
 
   useEffect(() => {
+    changePaginateDetalle(); 
+  }, [detalles]);
+
+  useEffect(() => {
       setDetalles([]);
       setDetallesPaginate([]);
-      changePaginateDetalle(); 
+    
       if(contrato.id != ""){
         service.getDetalles(contrato.id).then( 
           data => {
@@ -42,7 +46,6 @@ const ListarDetalles: React.FC<{
               setPaginasDetalle(Math.ceil(0));
               setTotalDetalle(0);
             }
-            changePaginateDetalle(); 
           }
         );
       }   

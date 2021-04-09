@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 
 import { Contrato } from "../domain/contrato";
 
@@ -90,7 +90,9 @@ return (
                   <div className="flex items-center">                      
                     <button className="mr-2"
                       title="add" 
-                      onClick={() => {setContrato(contrato)}}>
+                      onClick={() => {
+                        setContrato(contrato)}
+                      }>
                       <svg 
                         style={{display: selected != contrato ? 'block' : 'none'}}
                         className="w-6 h-6 text-gray-500"
