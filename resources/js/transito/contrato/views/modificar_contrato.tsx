@@ -137,7 +137,6 @@ const ModificarContratos: React.FC<{
         paginate.push(vehiculo);  
       index++;
     }
-
     setVehiculosPaginate([]);
     setVehiculosPaginate(paginate);
   }
