@@ -36,7 +36,7 @@ let doSignaling = (iceRestart: any) => {
       pc.setRemoteDescription(res);
     })
     .catch(err => {
-      //to do anything
+      //to do anything...
     });
 };
 
