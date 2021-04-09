@@ -68804,6 +68804,7 @@ var modal_vehiculo_1 = __importDefault(__webpack_require__(/*! ./modal_vehiculo 
 var VehiculoService_1 = __importDefault(__webpack_require__(/*! ../application/VehiculoService */ "./resources/js/transito/vehiculo/application/VehiculoService.ts"));
 var modal_vehiculo_eliminar_1 = __importDefault(__webpack_require__(/*! ./modal_vehiculo_eliminar */ "./resources/js/transito/vehiculo/views/modal_vehiculo_eliminar.tsx"));
 var vehiculo_1 = __webpack_require__(/*! ../domain/vehiculo */ "./resources/js/transito/vehiculo/domain/vehiculo.ts");
+var uuid_1 = __webpack_require__(/*! ../../shared/infrastructure/uuid */ "./resources/js/transito/shared/infrastructure/uuid.ts");
 var spinner_1 = __importDefault(__webpack_require__(/*! ../../shared/views/spinner */ "./resources/js/transito/shared/views/spinner.tsx"));
 var tags = [1, 2, 3, 4, 5, 6, 7, 8];
 var ListVehiculo = function () {
@@ -68845,7 +68846,72 @@ var ListVehiculo = function () {
             react_1.default.createElement("button", { onClick: function () { showModal(new vehiculo_1.Vehiculo()); }, className: 'px-4 p-2 inline-flex text-xs leading-5 font-semibold rounded-lg text-green-50', style: { backgroundColor: '#45BF55' } },
                 react_1.default.createElement("svg", { className: 'w-6 h-6 text-white-500', xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" },
                     react_1.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M12 6v6m0 0v6m0-6h6m-6 0H6" })),
-                react_1.default.createElement("span", { className: "ml-2" }, "Agregar")))));
+                react_1.default.createElement("span", { className: "ml-2" }, "Agregar"))),
+        react_1.default.createElement("div", { className: "flex flex-col" },
+            react_1.default.createElement("div", { className: "my-4 overflow-x-auto sm:-mx-6 lg:-mx-8" },
+                react_1.default.createElement("div", { className: "py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8" },
+                    react_1.default.createElement("div", { className: "shadow overflow-hidden border-b border-gray-200 sm:rounded-lg" },
+                        react_1.default.createElement("table", { className: "min-w-full divide-y divide-gray-200" },
+                            react_1.default.createElement("thead", { className: "bg-gray-50" },
+                                react_1.default.createElement("tr", null,
+                                    react_1.default.createElement("th", { scope: "col", className: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" }, "PLACA"),
+                                    react_1.default.createElement("th", { scope: "col", className: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" }, "CAPACIDAD"),
+                                    react_1.default.createElement("th", { scope: "col", className: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" }, "TIPO"),
+                                    react_1.default.createElement("th", { scope: "col", className: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" }, "CONDUCTOR"),
+                                    react_1.default.createElement("th", { scope: "col", className: "px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" }, "ACCIONES"))),
+                            react_1.default.createElement("tbody", { className: "bg-white divide-y divide-gray-200" }, vehiculos.map(function (vehiculo) {
+                                return (react_1.default.createElement("tr", { className: 'hover:bg-gray-100 cursor-pointer', key: vehiculo.id },
+                                    react_1.default.createElement("td", { className: "px-6 py-4 whitespace-nowrap" },
+                                        react_1.default.createElement("div", { className: "flex items-center" },
+                                            react_1.default.createElement("div", { className: "ml-4" },
+                                                react_1.default.createElement("div", { className: "text-sm font-medium text-gray-900" }, vehiculo.placa)))),
+                                    react_1.default.createElement("td", { className: "px-6 py-4 whitespace-nowrap text-gray-500" }, vehiculo.capacidad),
+                                    react_1.default.createElement("td", { className: "px-6 py-4 whitespace-nowrap text-sm text-gray-500" }, vehiculo.tipo),
+                                    react_1.default.createElement("td", { className: "px-6 py-4 whitespace-nowrap text-sm text-gray-500" }, vehiculo.conductor.nombre),
+                                    react_1.default.createElement("td", { className: "px-6 py-4 whitespace-nowrap text-right text-sm font-medium " },
+                                        react_1.default.createElement("div", { className: 'flex items-center' },
+                                            react_1.default.createElement("button", { className: '', onClick: function () {
+                                                    showModal(vehiculo);
+                                                }, title: 'edit' },
+                                                react_1.default.createElement("svg", { className: 'w-6 h-6 text-gray-500', xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" },
+                                                    react_1.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" }))),
+                                            react_1.default.createElement("button", { className: '', onClick: function () {
+                                                    showModalEliminar(vehiculo.id);
+                                                }, title: 'delete' },
+                                                react_1.default.createElement("svg", { className: 'w-6 h-6 text-gray-500', xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" },
+                                                    react_1.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414 6.414a2 2 0 001.414.586H19a2 2 0 002-2V7a2 2 0 00-2-2h-8.172a2 2 0 00-1.414.586L3 12z" })))))));
+                            }))),
+                        react_1.default.createElement("div", { className: "bg-white w-full px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6" },
+                            react_1.default.createElement("div", { className: "flex-1 flex justify-between sm:hidden" },
+                                react_1.default.createElement("a", { className: "relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:text-gray-500" }, "Anterior"),
+                                react_1.default.createElement("a", { className: "ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:text-gray-500" }, "Siguiente")),
+                            react_1.default.createElement("div", { className: "hidden sm:flex-1 sm:flex sm:items-center sm:justify-between" },
+                                react_1.default.createElement("div", null,
+                                    react_1.default.createElement("p", { className: "text-sm text-gray-700" },
+                                        "P\u00E1gina",
+                                        react_1.default.createElement("span", { className: "font-medium" },
+                                            " ",
+                                            pagina,
+                                            " "),
+                                        "de",
+                                        react_1.default.createElement("span", { className: "font-medium" },
+                                            " ",
+                                            paginas,
+                                            " "))),
+                                react_1.default.createElement("div", null,
+                                    react_1.default.createElement("nav", { className: "relative z-0 inline-flex rounded-md shadow-sm -space-x-px", "aria-label": "Pagination" },
+                                        react_1.default.createElement("a", { onClick: function () { return (setPagina(pagina > 1 ? pagina - 1 : 1)); }, className: "relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50" },
+                                            react_1.default.createElement("span", { className: "sr-only" }, "Previous"),
+                                            react_1.default.createElement("svg", { className: "h-5 w-5", xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 20 20", fill: "currentColor", "aria-hidden": "true" },
+                                                react_1.default.createElement("path", { fillRule: "evenodd", d: "M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z", clipRule: "evenodd" }))),
+                                        react_1.default.createElement("span", { style: { display: paginas >= 9 ? 'block' : 'none' }, className: "relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700" }, "..."),
+                                        tags.map(function (index) {
+                                            return (react_1.default.createElement("span", { key: uuid_1.generateUuid(), onClick: function () { return (setPagina(index)); }, style: { display: paginas < 9 && index <= paginas ? 'block' : 'none' }, className: "relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50" }, index));
+                                        }),
+                                        react_1.default.createElement("a", { onClick: function () { return (setPagina(pagina < paginas ? pagina + 1 : pagina)); }, className: "relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50" },
+                                            react_1.default.createElement("span", { className: "sr-only" }, "Next"),
+                                            react_1.default.createElement("svg", { className: "h-5 w-5", xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 20 20", fill: "currentColor", "aria-hidden": "true" },
+                                                react_1.default.createElement("path", { fillRule: "evenodd", d: "M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z", clipRule: "evenodd" })))))))))))));
 };
 exports.default = ListVehiculo;
 
