@@ -23,6 +23,7 @@ const Transito = () => {
               }
             ]}
           />
+          
           <Switch>
             <Route path='/transito/entrada'>
               <CrearEntrada/>
