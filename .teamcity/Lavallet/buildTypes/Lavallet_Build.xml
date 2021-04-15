@@ -46,10 +46,11 @@
     <build-extensions>
       <extension id="BUILD_EXT_1" type="pullRequests">
         <parameters>
-          <param name="authenticationType" value="vcsRoot" />
+          <param name="authenticationType" value="token" />
           <param name="filterAuthorRole" value="MEMBER" />
           <param name="filterTargetBranch" value="+:refs/heads/main" />
           <param name="providerType" value="github" />
+          <param name="secure:accessToken" value="credentialsJSON:ee5da9b4-f8c2-48cc-8e24-9d67a308207d" />
           <param name="vcsRootId" value="Lavallet_HttpsGithubComJordanj9lavalletRefsHeadsMain" />
         </parameters>
       </extension>
