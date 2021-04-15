@@ -58,8 +58,9 @@
         <parameters>
           <param name="github_authentication_type" value="token" />
           <param name="github_host" value="https://api.github.com" />
+          <param name="github_oauth_user" value="colonca" />
           <param name="publisherId" value="githubStatusPublisher" />
-          <param name="secure:github_access_token" value="credentialsJSON:73aefe66-df95-48fa-967e-5803f948e39d" />
+          <param name="secure:github_access_token" value="credentialsJSON:ee5da9b4-f8c2-48cc-8e24-9d67a308207d" />
           <param name="vcsRootId" value="Lavallet_HttpsGithubComJordanj9lavalletRefsHeadsMain" />
         </parameters>
       </extension>
