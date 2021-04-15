@@ -34,15 +34,22 @@
       <vcs-entry-ref root-id="Lavallet_HttpsGithubComJordanj9lavalletRefsHeadsMain" />
     </vcs-settings>
     <requirements />
-    <build-triggers />
+    <build-triggers>
+      <build-trigger id="vcsTrigger" type="vcsTrigger">
+        <parameters>
+          <param name="branchFilter" value="+:*" />
+          <param name="enableQueueOptimization" value="true" />
+          <param name="quietPeriodMode" value="DO_NOT_USE" />
+        </parameters>
+      </build-trigger>
+    </build-triggers>
     <build-extensions>
       <extension id="BUILD_EXT_1" type="pullRequests">
         <parameters>
-          <param name="authenticationType" value="token" />
+          <param name="authenticationType" value="vcsRoot" />
           <param name="filterAuthorRole" value="MEMBER" />
           <param name="filterTargetBranch" value="+:refs/heads/main" />
           <param name="providerType" value="github" />
-          <param name="secure:accessToken" value="credentialsJSON:73aefe66-df95-48fa-967e-5803f948e39d" />
           <param name="vcsRootId" value="Lavallet_HttpsGithubComJordanj9lavalletRefsHeadsMain" />
         </parameters>
       </extension>
