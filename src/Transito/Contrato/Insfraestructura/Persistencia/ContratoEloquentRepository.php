@@ -133,7 +133,6 @@ class ContratoEloquentRepository implements IContratoRepository
         return ContratoBuilder::formtArray($model->attributesToArray());
     }
 
-
     private function syncDetalles(ContratoDetalle $detalles): void
     {
         foreach ($detalles as $detalle) {
