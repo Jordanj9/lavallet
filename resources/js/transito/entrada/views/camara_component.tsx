@@ -3,7 +3,7 @@ import axios from 'axios';
 import ReactDOM from 'react-dom';
 let pc:RTCPeerConnection;
 let videoRef:any;
-
+let canvasElement:any;
 let doSignaling = (iceRestart:any) => {
     console.log({iceRestart});
     pc.createOffer({iceRestart})
@@ -16,6 +16,20 @@ let doSignaling = (iceRestart:any) => {
         .then(res => res.data)
         .then(res => {pc.setRemoteDescription(res); console.log(res)})
        // .catch(alert)
+}
+export function takePhoto(){
+  const video = videoRef;
+  ReactDOM.render(<canvas ref={canvas=>canvasElement=canvas} style={{height:200}}></canvas>, document.getElementById("canvas"));
+  // scale the canvas accordingly
+  canvasElement.width = video.videoWidth;
+  canvasElement.height = video.videoHeight;
+  // draw the video at that frame
+  canvasElement.getContext('2d')
+  .drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+  // convert it to a usable data URL
+  //this dataURL can be storage on dataBase to reDraw the image
+  const dataURL = canvasElement.toDataURL();
+  return dataURL;
 }
 export class Camara extends React.Component<any, any> {
     componentDidMount(){
@@ -34,12 +48,21 @@ export class Camara extends React.Component<any, any> {
         }
         doSignaling(false);
     };
+
+    constructor(props: any) {
+      super(props);
+      videoRef = React.createRef();
+
+  }
     render(){
       return(
-          <div>
-               <div id="remoteVideos">
-                  </div>
-          </div>
+        <div className="flex justify-center">
+
+            <div className="md:w-1/2" id="remoteVideos"></div>
+            <div className="md:w-1/2" id="canvas">
+            </div>
+        </div>
+
       );
     }
 }

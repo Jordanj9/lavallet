@@ -13,6 +13,7 @@ import ModalEntrada from "./modal_entrada";
 import { VehiculoDTO } from "../../vehiculo/application/VehiculoDTO";
 import ListarContratosEntrada from "../../contrato/views/list_contrato_entrada";
 import {Camara} from "../../entrada/views/camara_component";
+import {takePhoto} from "../../entrada/views/camara_component";
 import ContratoService from "../../contrato/application/ContratoService";
 import Preview from "../../shared/views/preview";
 import { Imprimible } from "../../salida/domain/imprimible";
@@ -43,7 +44,6 @@ const CrearEntrada: React.FC = () => {
   const [warning, setWarning] = useState(false);
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
-
 
   useEffect(() => {
     setContratos([]);
@@ -344,12 +344,7 @@ const CrearEntrada: React.FC = () => {
           <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div className="p-2 align-middle min-w-full sm:px-6 lg:px-8">
               <div
-                style={{
-                  position: "absolute",
-                  left: "50%",
-                  top: "50%",
-                  transform: "translate(-50%, -50%)"
-                }}
+
               >
                 <Camara></Camara>
               </div>
@@ -442,6 +437,7 @@ const CrearEntrada: React.FC = () => {
         <button
           onClick={() => {
             preview();
+            takePhoto();
           }}
           className="px-8 py-3 | mr-4 | inline-flex text-sm md: leading-5 font-semibold rounded-lg text-green-50"
           style={{ backgroundColor: "#45BF55" }}
