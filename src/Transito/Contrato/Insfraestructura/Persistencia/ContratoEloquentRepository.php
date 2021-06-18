@@ -1,18 +1,31 @@
 <?php
 
+
 namespace Cantera\Transito\Contrato\Insfraestructura\Persistencia;
 
+
 use Cantera\Transito\Cliente\Dominio\Cliente;
+use Cantera\Transito\Cliente\Dominio\ClienteId;
 use Cantera\Transito\Conductor\Dominio\Conductor;
 use Cantera\Transito\Conductor\Infraestructura\Persistencia\Eloquent\ConductorModel;
 use Cantera\Transito\Contrato\Dominio\Contrato;
 use Cantera\Transito\Contrato\Dominio\ContratoBuilder;
 use Cantera\Transito\Contrato\Dominio\ContratoDetalle;
+use Cantera\Transito\Contrato\Dominio\ContratoFecha;
 use Cantera\Transito\Contrato\Dominio\ContratoId;
+use Cantera\Transito\Contrato\Dominio\ContratoTickets;
+use Cantera\Transito\Contrato\Dominio\ContratoUbicacion;
 use Cantera\Transito\Contrato\Dominio\ContratoVehiculo;
 use Cantera\Transito\Contrato\Dominio\IContratoRepository;
 use Cantera\Transito\Contrato\Insfraestructura\Persistencia\Eloquent\ContratoModel;
+use Cantera\Transito\Serie\Dominio\Serie;
+use Cantera\Transito\Serie\Dominio\SerieActual;
+use Cantera\Transito\Serie\Dominio\SerieId;
+use Cantera\Transito\Serie\Dominio\SeriePrefijo;
+use Cantera\Transito\Serie\Dominio\SerieTipo;
 use Cantera\Transito\Serie\Infraestructura\Persistencia\Eloquent\SerieModel;
+use Cantera\Transito\Vehiculo\Dominio\VehiculoPlaca;
+use Cantera\Transito\Vehiculo\Infraestructura\Persistencia\Eloquent\VehiculoModel;
 use Illuminate\Database\Eloquent\Model;
 
 class ContratoEloquentRepository implements IContratoRepository
@@ -133,19 +146,17 @@ class ContratoEloquentRepository implements IContratoRepository
         return ContratoBuilder::formtArray($model->attributesToArray());
     }
 
+
     private function syncDetalles(ContratoDetalle $detalles): void
     {
         foreach ($detalles as $detalle) {
-            $array[] = [
-                'material_id'=>$detalle->getMaterial()->getId()->value(),
+            $array[$detalle->getMaterial()->getId()->value()] = [
                 'volumen' => $detalle->getTermino()->getVolumen(),
                 'tipo' => $detalle->getTermino()->getTipo(),
                 'transaccion' => $detalle->getTransaccion()->value()
             ];
         }
-//        dd($array);
-        $this->model->materials()->detach();
-        $this->model->materials()->attach($array);
+        $this->model->materials()->sync($array);
     }
 
     private function syncVehiculos(ContratoVehiculo $vehiculos): void
@@ -164,5 +175,10 @@ class ContratoEloquentRepository implements IContratoRepository
         return $serie->attributesToArray();
     }
 
+    private function syncTickets(ContratoTickets $tickets): void
+    {
+        //
+
+    }
 
 }

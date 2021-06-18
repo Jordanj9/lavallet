@@ -18,7 +18,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::middleware(['dbtransaction'])->group(function () {
+Route::middleware(['auth:sanctum','dbtransaction'])->group(function () {
 
     //MATERIAL
     Route::get('/material', 'Material\MaterialAllController');

@@ -8,13 +8,14 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^8.0",
+        "php": "^7.2 | ^8.0",
         "barryvdh/laravel-cors": "^2.0",
         "fideloper/proxy": "^4.2",
         "fzaninotto/faker": "^1.9.1",
         "guzzlehttp/guzzle": "^6.3",
         "lambdish/phunctional": "^2.1",
         "laravel/framework": "^7.24",
+        "laravel/sanctum": "^2.9",
         "laravel/tinker": "^2.0",
         "laravel/ui": "^2.0",
         "php-di/php-di": "^6.3"
