@@ -40,7 +40,9 @@ useEffect(() => {
         setImprimible(new Imprimible().setSalida(data.data));
         setLoading(false);
       }
-    );
+    ).catch(error => {
+      setLoading(false);
+    });
   }  
 }, [pista]);
 

@@ -49,6 +49,7 @@ const CrearEntrada: React.FC = () => {
     if (pista != "") {
       setLoading(true);
       contratoService.getByPlaca(pista).then(value => {
+        console.log(value);
         if (value.data != null) {
           setContratos(value.data);
           if (value.data.length > 0) {
@@ -62,6 +63,8 @@ const CrearEntrada: React.FC = () => {
           setContratos([]);
           setContrato(new Contrato());
         }
+        setLoading(false);
+      }).catch(error => {
         setLoading(false);
       });
     }
