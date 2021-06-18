@@ -3,6 +3,8 @@ import {Route,Switch} from 'react-router-dom';
 import {v4 as uuidv4} from "uuid";
 
 import Header from "../components/Header";
+import ReportContratos from "../transito/contrato/views/report_contrato";
+import ListMaterialReport from "../transito/material/views/list_material_report";
 
 const Reportes = () => {
 
@@ -29,10 +31,10 @@ const Reportes = () => {
             />
               <Switch>
                 <Route path='/reportes/contratos'>
-                  
+                  <ReportContratos></ReportContratos>
                 </Route>
                 <Route path='/reportes/materiales'>
-                  
+                  <ListMaterialReport></ListMaterialReport>
                 </Route>
               </Switch>
         </div>

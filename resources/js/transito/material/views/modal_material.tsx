@@ -15,10 +15,6 @@ const ModalMaterial: React.FC<{
   const [warning, setWarning] = useState(false);
   const [message, setMessage] = useState('');
 
-  function hiddenModal(): void {
-    setShowModal(false);
-  }
-
   async function saveOrUpdate(value:Material) {
     if(oldMaterial.id != ""){
       const status = await service.update(value);

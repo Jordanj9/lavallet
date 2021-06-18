@@ -7,6 +7,15 @@ export default class MaterialService {
 
   getMateriales = async (): Promise<{status:number, mensaje:string, data:Material[], length:number}> => {
     return await MaterialRepository.getAll();
+  }  
+
+  find = async (id:string): Promise<{status:number, mensaje:string, data:Material[], length:number}> => {
+    //CAMBIAR POR RUTA DE BUSQUEDA POR ID
+    return await MaterialRepository.getAll();
+  }
+  
+  getReport = async (inicio:string, final:string): Promise<{mensaje:string, data:any}> => {
+    return await MaterialRepository.getReport(inicio, final);
   }
 
   getPaginate = async (limit:number, offset:number): Promise<{status:number, mensaje:string, data:Material[], length:number}> => {

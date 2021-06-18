@@ -24,6 +24,10 @@ export default class ContratoService {
         return await ContratoRepository.getDetalles(id);
     } 
     
+    getReport = async (id:string, desde:string, hasta:string): Promise<{data: ContratoFull, mensaje:string}> => {
+        return await ContratoRepository.getReport(id, desde, hasta);
+    }
+    
     getDependencias = async (id:string): Promise<{data: ContratoFull, mensaje:string}> => {
         return await ContratoRepository.getDependencias(id);
     }

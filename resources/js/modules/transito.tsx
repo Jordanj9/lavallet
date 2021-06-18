@@ -17,23 +17,22 @@ const Transito = () => {
             {
               id: uuidv4(),
               title: "Entrada",
-              url: "/transito/entrada",
+              url: "/dashboard/transito/entrada",
               active: true
             },
             {
               id: uuidv4(),
               title: "Salida",
-              url: "/transito/salida",
+              url: "/dashboard/transito/salida",
               active: false
             }
           ]}
         />
-
         <Switch>
-          <Route path="/transito/entrada">
+          <Route path="/dashboard/transito/entrada">
             <CrearEntrada />
           </Route>
-          <Route path="/transito/salida">
+          <Route path="/dashboard/transito/salida">
             <CrearSalida />
           </Route>
         </Switch>
