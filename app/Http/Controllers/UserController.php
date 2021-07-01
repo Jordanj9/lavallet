@@ -50,11 +50,11 @@ class UserController extends Controller
             'password' => Hash::make(fields['password'])
         ]);
 
-        $token = $user->createToken('user-register')->plainTextToken;
-        $response=[
-            'user'=>$user,
-            'token'=>$token
-        ];
+//        $token = $user->createToken('user-register')->plainTextToken;
+//        $response=[
+//            'user'=>$user,
+//            'token'=>$token
+//        ];
 
         return response()->json(['data' => '', 'mensaje' => 'Usuario Gurdado Correctamente'], Response::HTTP_OK);
     }

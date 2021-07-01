@@ -19,6 +19,10 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::middleware(['auth:sanctum','dbtransaction'])->group(function () {
+
+    Route::group(['middleware' => 'role:administrador'], function() {
+        //se meten aqui todas las rutas del administrador
+    });
     //USUARIOS
     Route::resource('usuarios','UserController');
 //    Route::post('/usuario','UserController@')
