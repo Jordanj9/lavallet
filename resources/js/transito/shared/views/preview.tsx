@@ -18,11 +18,9 @@ const Preview: React.FC<{
     function imprimirElemento(id:string) {
         var elemento = document.getElementById(id) as HTMLElement;
         var contenido = elemento.innerHTML;
-        //var contenidoOriginal= document.body.innerHTML;
         document.body.innerHTML = contenido;   
         window.print();    
         location.reload(); 
-        //document.body.innerHTML = contenidoOriginal;
     }
 
 return(
@@ -105,7 +103,7 @@ return(
                     <p style={{fontSize: '9pt'}}>Recibido</p>
                 </div>                
             </div>
-            <div className="grid-span-4 my-2 text-center my-4">
+            <div className="grid-span-4 text-center my-4">
                 <p style={{fontSize: '9pt'}}>Oficinas y Planta: Km 6 Via Patillal - Margen derecha</p>
                 <p style={{fontSize: '9pt'}}>gerenciasantaluciadelvalle@outlook.es</p>
                 <p style={{fontSize: '9pt'}}>vallecuello@hotmail.com</p>

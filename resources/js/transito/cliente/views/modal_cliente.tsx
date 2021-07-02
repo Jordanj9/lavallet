@@ -1,17 +1,11 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import { Cliente } from "../domain/cliente";
 import ClienteService from "../application/ClienteService";
-import Modal from "../../shared/views/modal";
 import UbicacionService from "../../shared/application/UbicacionService";
 import { Departamento } from "../../shared/domain/departamento";
 import { Municipio } from "../../shared/domain/municipio";
-import {Formik}  from 'formik';
+import {Formik, FormikProps}  from 'formik';
 import Toast from "../../shared/views/toast";
-
-enum STATUS {
-    OK = 200,
-    CREATED = 201
-}
 
 const ModalCliente: React.FC<{
     show: boolean;
@@ -31,7 +25,13 @@ const ModalCliente: React.FC<{
     const [showModalRequest, setShowModalRequest] = useState(false);
     const [warning, setWarning] = useState(false);
     const [message, setMessage] = useState('');
-    
+
+    const formikRef = useRef<FormikProps<Cliente>>(null);
+  
+    useEffect(() => {
+       if(formikRef.current !== null)
+          formikRef.current.setValues(cliente);
+    },[cliente]);
     
     useEffect(() => {
         if(show){
@@ -114,11 +114,10 @@ const ModalCliente: React.FC<{
 
     return (
         <Formik
+            innerRef={formikRef}
             initialValues={cliente}
             validate={value => {
                 const errors:any = {};
-                setCliente(value);
-
                 if(!value.identificacion)
                     errors.identificacion = "Este campo es obligatorio";
                 if(!value.nombre) 
@@ -129,7 +128,6 @@ const ModalCliente: React.FC<{
                     errors.correo = "Este campo es obligatorio";
                 if(!value.direccion)
                     errors.direccion = "Este campo es obligatorio";
-
                 return errors;
             }}
             onSubmit={(values, {setSubmitting}:any) => {
@@ -141,13 +139,7 @@ const ModalCliente: React.FC<{
                 <form onSubmit={handleSubmit}>
                     <div className={'pb-4 ' + (show ? 'block' : 'hidden')}>
                         <Toast show={showModalRequest} setShow={setShowModalRequest} message={message} warning={warning}/>
-                        <div className='fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-40'
-                            style={{zIndex: 100}}
-                            onClick={(e:any) => { hidden(); setShowModalRequest(false); handleReset(e) }}
-                            onMouseEnter={(e:any) => {cliente.id != "" ? setValues(cliente) : handleReset(e);}}>
-                        </div>
                         <div className='fixed | top-1/2 left-1/2 | w-6/12 | bg-white | shadow | rounded-lg' 
-                            onMouseEnter={(e:any) => {cliente.id != "" ? setValues(cliente) : handleReset(e);}}
                             style={{ transform: 'translate(-50%,-50%)', zIndex: 100}}>
                             <div className='p-6 flex flex-wrap'>
                                 <label className="block p-2 w-1/3">
@@ -162,6 +154,7 @@ const ModalCliente: React.FC<{
                                 <label className="block p-2 w-1/3">
                                     <span className="text-gray-700">Identificacion</span>
                                     <input type="text" onChange={handleChange} 
+                                        autoComplete='false'
                                         name='identificacion' disabled={cliente.id != '' ? true : false} 
                                         value={values.identificacion}
                                         style={{borderColor: errors.identificacion ? 'red' : 'gainsboro'}}

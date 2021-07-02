@@ -19,11 +19,11 @@ import { Departamento } from "../../shared/domain/departamento";
 import { Municipio } from "../../shared/domain/municipio";
 import UbicacionService from "../../shared/application/UbicacionService";
 import Spinner from "../../shared/views/spinner";
+import ModalSearch from "../../shared/views/modal_search";
 
 const tags = [1,2,3,4,5,6,7,8];
 
 const CrearContratos: React.FC = () => {
-  let i = 0;
   
   const service  = new ContratoService();
   const clienteService = new ClienteService();
@@ -40,8 +40,11 @@ const CrearContratos: React.FC = () => {
   const [paginasVehiculo, setPaginasVehiculo] = useState(1);
   const [paginaVehiculo, setPaginaVehiculo] = useState(1);
   
-  const [refresh, setRefresh] = useState(true);
   const [show, setShow] = useState(false);
+  const [showCliente, setShowCliente] = useState(false);  
+  const [showMaterial, setShowMaterial] = useState(false);
+  const [showVehiculo, setShowVehiculo] = useState(false);
+
   const [warning, setWarning] = useState(false);
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
@@ -54,81 +57,16 @@ const CrearContratos: React.FC = () => {
   const [serie, setSerie] = useState<Serie>(new Serie());
   const [contrato, setContrato] = useState<Contrato>(new Contrato());
   const [detalle, setDetalle] = useState<Detalle>(new Detalle());
-  const [vehiculo, setVehiculo] = useState<Vehiculo>(new Vehiculo());
 
   const [cliente, setCliente] = useState<Cliente>(new Cliente());
-  const [clientes, setClientes] = useState<Cliente[]>([]);
 
-  const [materiales, setMateriales] = useState<Material[]>([]);
   const [detalles, setDetalles] = useState<Detalle[]>([]);
   const [detallesPaginate, setDetallesPaginate] = useState<Detalle[]>([]);
 
-  const [vehiculos, setVehiculos] = useState<Vehiculo[]>([]);
   const [vehiculosSelect, setVehiculosSelect] = useState<Vehiculo[]>([]);
   const [vehiculosPaginate, setVehiculosPaginate] = useState<Vehiculo[]>([]);
 
-  useEffect(() => { 
-    if(refresh){
-      setLoading(true); 
-      clienteService.getClientes().then(clienteData => {
-        let value = clienteData.data;
-        if(value != null){
-          setClientes(value);
-          if(value.length > 0){
-            setCliente(value[0]);
-            //UBICACIONES
-            ubicacionService.get().then(ubicacionData => {
-              let dpto = ubicacionData.data.find(x => x.nombre == value[0].departamento) as Departamento;
-              setMunicipios(dpto.municipios);
-              setDepartamentos(ubicacionData.data);
-              departamento.nombre = value[0].departamento;
-              municipio.nombre = value[0].municipio; 
-              setLoading(false);            
-            });
-  
-            let _contrato = new Contrato();
-            _contrato.cliente = value[0];
-            _contrato.ubicacion.departamento = value[0].departamento;
-            _contrato.ubicacion.municipio = value[0].municipio;
-            _contrato.ubicacion.direccion = value[0].direccion;
-            setContrato(_contrato)
-          }
-        }             
-      });      
-      materialService.getMateriales().then(materialData => {
-        let value = materialData.data;
-        if(value != null){
-          setMateriales(value);
-          setDetalle({
-            id: '',
-            material: value.length > 0 ? value[0] : new Material(),
-            transaccion:'CARGA',
-            termino: new TerminoDTO('0'),
-            contrato_id: ''
-          });
-        }
-      });
-      vehiculoService.getVehiculos().then(vehiculoData => {
-        let value = vehiculoData.data;
-        if(value != null){
-          setVehiculos(value);
-          if(value.length > 0)
-            setVehiculo(value[0])
-        }
-      });
-      setRefresh(false);
-    }
-
-    if(cliente.id != null && departamentos.length > 0){
-      let dpto = departamentos.find(x => x.nombre == cliente.departamento) as Departamento;
-      setMunicipios(dpto.municipios);
-      departamento.nombre = cliente.departamento;
-      municipio.nombre = cliente.municipio;
-    }
-
-    service.getSerie().then(value => {
-      setSerie(value.data);
-    });
+  useEffect(() => {
 
     detalle.transaccion = 'CARGA';
     detalle.termino.tipo = 'DEFINIDO';
@@ -136,7 +74,38 @@ const CrearContratos: React.FC = () => {
     changePaginateDetalle();
     changePaginateVehiculo();
 
-  }, [show, cliente, totalDetalle, totalVehiculo, paginaDetalle, paginaVehiculo] )
+  }, [show, totalDetalle, totalVehiculo, paginaDetalle, paginaVehiculo] );
+
+  useEffect(() => {
+    service.getSerie().then(value => {
+      setSerie(value.data);
+    });
+    ubicacionService.get().then( deptos => {
+      setDepartamentos(deptos.data);
+      if(deptos.data)
+        setDepartamento(deptos.data[0]);         
+    });
+  }, []);
+
+  useEffect(() => {
+    if(departamento) {
+      setMunicipios(departamento.municipios);
+      if(departamento.municipios)
+        setMunicipio(departamento.municipios[0])    
+    }
+  }, [departamento]);
+
+  useEffect(() => {
+    if(cliente.id){
+      let newContrato = new Contrato();
+      newContrato.cliente = cliente;
+      newContrato.ubicacion.departamento = cliente.departamento;
+      newContrato.ubicacion.municipio = cliente.municipio;
+      newContrato.ubicacion.direccion = cliente.direccion;
+      setContrato(newContrato); 
+    }  
+
+  }, [cliente]);
 
   function clean(){
     setVehiculosSelect([]);
@@ -177,24 +146,8 @@ const CrearContratos: React.FC = () => {
     setVehiculosPaginate(paginate);
   }
 
-  function changeCliente(ev: any) {
-    let id = ev.target.value;
-    let value = clientes.find( x => x.identificacion == id ) as Cliente ;
-    setCliente(value);
-  }
-
-  function changeVehiculo(ev: any) {
-    if(vehiculos.length > 0){
-      let id = ev.target.value;
-      let value = vehiculos.find( x => x.placa == id ) as Vehiculo ;
-      setVehiculo(value);
-    }
-  }
-
-  function changeMaterial(ev: any) {
-    let id = ev.target.value;
-    let value = materiales.find( x => x.id == id ) as Material ;
-    setDetalle({...detalle, ['material']: value });
+  function setMaterial(material:Material) {
+    setDetalle({...detalle, ['material']: material });
   }
 
   async function save() {
@@ -203,7 +156,7 @@ const CrearContratos: React.FC = () => {
     contrato.serie = serie;
     contrato.ubicacion.departamento = departamento.nombre;
     contrato.ubicacion.municipio = municipio.nombre;
-    console.log(contrato);
+    
     if(validate()){
       const status = await service.save(contrato);
       if(status.data != null) {
@@ -227,7 +180,7 @@ const CrearContratos: React.FC = () => {
   }
 
   function addDetalle(_detalle:Detalle) {
-    if(materiales.length > 0){
+    if(detalle.material.id){
       setPaginasDetalle(Math.ceil((totalDetalle+1)/4));
       setTotalDetalle(totalDetalle + 1);
       let newData = [ ...detalles, _detalle ];
@@ -278,15 +231,13 @@ const CrearContratos: React.FC = () => {
     setMunicipio(_municipio);
   }
 
-  function addVehiculo() {    
+  function addVehiculo(vehiculo:Vehiculo) {    
     if(vehiculosSelect.findIndex(x => x.id == vehiculo.id) == -1){
-      if(vehiculos.length > 0){
-        setPaginasVehiculo(Math.ceil((totalVehiculo+1)/4));
-        setTotalVehiculo(totalVehiculo  + 1);
-        let newData = [ ...vehiculosSelect, vehiculo ];
-        setVehiculosSelect(newData);
-        changePaginateVehiculo();
-      }
+      setPaginasVehiculo(Math.ceil((totalVehiculo+1)/4));
+      setTotalVehiculo(totalVehiculo  + 1);
+      let newData = [ ...vehiculosSelect, vehiculo ];
+      setVehiculosSelect(newData);
+      changePaginateVehiculo();
     }
     else{
       setTitle('Atención');
@@ -310,52 +261,87 @@ const CrearContratos: React.FC = () => {
 
   function hiddenModal(): void {
     setShow(false);
-  }
-  
-  function cargando(message:string, show:boolean){  
-    setLoading(show);
-    setMessage(message);
-  }
+    setShowCliente(false);
+    setShowMaterial(false);
+    setShowVehiculo(false);
+  }  
 
   return (
     <div>
       <Spinner show={loading}/>
       <Modal show={show} hidden={hiddenModal} title={title} message={message} warning={warning}/>
-      <div style={{zIndex:0}}>
-        <div className='top-8 mb-12 p-4 col-span-3 bg-gray-50 rounded-lg  relative' style={{zIndex:0, backgroundColor: 'transparent'}}>
+      <ModalSearch show={showCliente} hidden={hiddenModal} service={clienteService} setResult={setCliente}/>
+      <ModalSearch show={showMaterial} hidden={hiddenModal} service={materialService} setResult={setMaterial}/>
+      <ModalSearch show={showVehiculo} hidden={hiddenModal} service={vehiculoService} setResult={addVehiculo}/>
+      <div style={{zIndex:0}} className="mb-2">
+
+        <div className='top-8 mb-12 p-4 col-span-3 bg-gray-50 rounded-lg relative' style={{zIndex:0, backgroundColor: 'transparent'}}>
           <div className='px-2 absolute -top-3.5 py-1 left-2 rounded-lg text-black-100' style={{ fontSize: '20pt'}}>Serie {serie.actual}
           </div>
         </div>
-        <div className='grid grid-cols-3 gap-x-4 gap-y-8' style={{zIndex:0}}>
-          <div className='bg-gray-50 top-4 rounded-lg  relative' style={{zIndex:0}}>
+        
+        <div className='grid grid-cols-3 gap-x-4 gap-y-8 relative' style={{zIndex:0}}>
+
+          <div className='bg-gray-50 top-4 rounded-lg relative' style={{zIndex:0, display:'flex', flexDirection:'column', justifyContent:'center'}}>
             <div className='px-2 absolute -top-3.5 py-1 left-2 rounded-lg text-gray-100'style={{backgroundColor: '#45BF55'}}>Cliente
             </div>
-            <div className="mx-4 mt-6">
-              <div className="">
-                <span className="text-gray-700">Cliente</span>
-                <select onChange={changeCliente} name='cliente' className="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" value={cliente.identificacion}>
-                  {
-                    clientes.map((cliente: Cliente) => {
-                      return (
-                        <option key={generateUuid()} value={cliente.identificacion}>{cliente.identificacion}</option>
-                      );
-                    })
-                  }
-                </select>
-              </div>
-            </div>
-            <div className="mx-4 mb-4">
-              <div className="">
+
+            <div className="mx-4">
+              <div className="my-2">
                 <span className="text-gray-700">Nombre</span>
-                <input value={cliente.nombre} type="text" disabled placeholder="?" className="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"/>
+                <input value={cliente?.nombre} type="text" disabled placeholder="?" className="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"/>
               </div>
-              <div className="">
+              <div className="my-2">
                 <span className="text-gray-700">Tipo</span>
-                <input value={cliente.tipo} type="text" disabled placeholder="?" className="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"/>
+                <input value={cliente?.tipo} type="text" disabled placeholder="?" className="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"/>
               </div>
             </div>
+
+            <div className="mx-4 my-2 flex justify-between">
+
+              <div className="w-30 mt-1">
+                <button
+                  type='button'
+                  onClick={() => {setShowCliente(true);}}
+                  className='mt-1 p-2 px-4 w-full inline-flex leading-5 rounded-lg text-green-50 justify-center'
+                  style={{backgroundColor: '#45BF55'}}>
+                    <svg 
+                      className="w-6 h-6 text-white-500"
+                      xmlns="http://www.w3.org/2000/svg" 
+                      fill="none" 
+                      viewBox="0 0 24 24" 
+                      stroke="currentColor">
+                      <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        strokeWidth={2} 
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </button>
+              </div>
+
+              <div className="w-30 mt-1">
+                <button
+                  type="submit"
+                  onClick={() => {setCliente(new Cliente())}}
+                  className='mt-1 p-2 px-4 w-full inline-flex leading-5 rounded-lg text-green-50 justify-center'
+                  style={{backgroundColor: '#E15252'}}>
+                    <svg xmlns="http://www.w3.org/2000/svg" 
+                      className="h-6 w-6 text-white-500" 
+                      fill="none" 
+                      viewBox="0 0 24 24" 
+                      stroke="currentColor">
+                      <path strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+              </div>
+
+            </div>            
           </div>
-          <div className='col-span-2 row-span-2 bg-gray-50 top-4 rounded-lg  relative' style={{zIndex:0}}>
+
+          <div className='col-span-2 row-span-1 bg-gray-50 top-4 rounded-lg  relative' style={{zIndex:0}}>
             <div className='px-2 absolute -top-3.5 py-1 left-2 rounded-lg text-gray-100' style={{backgroundColor: '#45BF55'}}>Materiales
             </div>
             <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -365,6 +351,8 @@ const CrearContratos: React.FC = () => {
                   validate={value => {
                     const errors:any = {};
 
+                    if(!detalle.material.id)
+                      errors.material = "Seleccione un material";                      
                     if(value.termino.tipo == 'DEFINIDO'){
                       if(!value.termino.volumen)
                         errors.termino = "Este campo es obligatorio";
@@ -387,86 +375,127 @@ const CrearContratos: React.FC = () => {
                   {
                     ({errors, handleChange, handleSubmit, values, isSubmitting}) => (
                     <form onSubmit={handleSubmit}>
+                      
                       <div className="flex">                  
-                        <div className="w-1/3">
-                          <div className="mx-4 mt-6 mb-4">
-                            <div className=''>
-                              <span className="text-gray-700">Material</span>
-                              <select onChange={changeMaterial} value={detalle.material.id} name='material' className="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                                {
-                                  materiales.map((material: Material) => {
-                                    return (
-                                      <option key={generateUuid()} value={material.id}>{material.nombre}</option>
-                                    );
-                                  })
-                                }
-                              </select>
-                            </div>
-                          </div>
-                        </div>
-                        <div className={values.termino.tipo == 'DEFINIDO' ? "w-1/4" : "w-1/3"}>
-                          <div className="mx-4 mt-6 mb-4">
-                            <div className="">
-                              <span className="text-gray-700">Tipo</span>
-                              <select onChange={handleChange} value={values.termino.tipo} name='termino.tipo' className="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                                <option value='DEFINIDO'>Definido</option>
-                                <option value='INDEFINIDO'>Indefinido</option>
-                              </select>
-                            </div>
-                          </div>
-                        </div>
-                        <div className={values.termino.tipo == 'DEFINIDO' ? "w-1/4" : "hidden"}>
-                          <div className="mx-4 mt-6 mb-4">
-                            <div className="">
-                              <span className="text-gray-700">Cantidad</span>
-                              <input 
-                                onChange={handleChange}
-                                value={values.termino.volumen}
-                                name='termino.volumen' 
-                                type="number"
-                                style={{borderColor: errors.termino ? 'red' : 'gainsboro'}}
-                                className="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"/>
-                              <div className="flex-end w-full pt-1" style={{display: errors.termino ? 'flex' : 'none'}}>
-                                <span style={{textAlign:'right', fontSize:'8pt', color:'red'}}>{errors.termino}</span>
+                        
+                        <div className="w-full flex">
+
+                          <div className="w-1/3">
+                            <div className="mr-2 ml-4 mt-6 mb-4">
+                              <div className=''>
+                                <span className="text-gray-700">Material</span>
+                                <input
+                                  readOnly
+                                  value={detalle.material.nombre}
+                                  name='material' 
+                                  type="text"
+                                  style={{borderColor: errors.material ? 'red' : 'gainsboro'}}
+                                  className="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"/>
+                                <div className="flex-end w-full pt-1" style={{display: errors.material ? 'flex' : 'none'}}>
+                                  <span style={{textAlign:'right', fontSize:'8pt', color:'red'}}>{errors.material}</span>
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                        <div className={values.termino.tipo == 'DEFINIDO' ? "w-1/4" : "w-1/3"}>
-                          <div className="mx-4 mt-6 mb-4">
-                            <div className="">
-                              <span className="text-gray-700">Operación</span>
-                              <select onChange={handleChange} value={values.transaccion} name='transaccion' className="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                                <option value='CARGA'>Carga</option>
-                                <option value='DESCARGA'>Descarga</option>
-                              </select>
+
+                          <div className={values.termino.tipo == 'DEFINIDO' ? "w-1/4" : "w-1/3"}>
+                            <div className="mx-2 mt-6 mb-4">
+                              <div className="">
+                                <span className="text-gray-700">Tipo</span>
+                                <select onChange={handleChange} value={values.termino.tipo} name='termino.tipo' className="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                  <option value='DEFINIDO'>Definido</option>
+                                  <option value='INDEFINIDO'>Indefinido</option>
+                                </select>
+                              </div>
                             </div>
                           </div>
+
+                          <div className={values.termino.tipo == 'DEFINIDO' ? "w-1/4" : "hidden"}>
+                            <div className="mx-2 mt-6 mb-4">
+                              <div className="">
+                                <span className="text-gray-700">Cantidad</span>
+                                <input 
+                                  onChange={handleChange}
+                                  value={values.termino.volumen}
+                                  name='termino.volumen' 
+                                  type="number"
+                                  style={{borderColor: errors.termino ? 'red' : 'gainsboro'}}
+                                  className="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"/>
+                                <div className="flex-end w-full pt-1" style={{display: errors.termino ? 'flex' : 'none'}}>
+                                  <span style={{textAlign:'right', fontSize:'8pt', color:'red'}}>{errors.termino}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className={values.termino.tipo == 'DEFINIDO' ? "w-1/4" : "w-1/3"}>
+                            <div className="mx-2 mt-6 mb-4">
+                              <div className="">
+                                <span className="text-gray-700">Operación</span>
+                                <select onChange={handleChange} value={values.transaccion} name='transaccion' className="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                                  <option value='CARGA'>Carga</option>
+                                  <option value='DESCARGA'>Descarga</option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                        
                         </div>
+
+                        <div className="w-30">
+                          <div className='mt-12 pl-4 flex justify-end'>
+                            <button
+                              type='button'
+                              onClick={() => {setShowMaterial(true);}}
+                              className='mt-1 p-2 px-4 w-full inline-flex leading-5 rounded-lg text-green-50 justify-center'
+                              style={{backgroundColor: '#45BF55'}}>
+                              <svg 
+                                className="w-6 h-6 text-white-500"
+                                xmlns="http://www.w3.org/2000/svg" 
+                                fill="none" 
+                                viewBox="0 0 24 24" 
+                                stroke="currentColor">
+                                <path 
+                                  strokeLinecap="round" 
+                                  strokeLinejoin="round" 
+                                  strokeWidth={2} 
+                                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="w-30">
+
+                          <div className='mt-9 p-4 flex justify-end'>
+                            <button
+                              disabled={isSubmitting}
+                              type="submit"
+                              className='p-2 px-4 inline-flex text-xs leading-5 font-semibold rounded-lg text-green-50'
+                              style={{backgroundColor: '#45BF55'}}>
+                                <svg 
+                                  className='w-6 h-6 text-white-500'
+                                  xmlns="http://www.w3.org/2000/svg" 
+                                  fill="none" 
+                                  viewBox="0 0 24 24" 
+                                  stroke="currentColor">
+                                  <path 
+                                    strokeLinecap="round" 
+                                    strokeLinejoin="round" 
+                                    strokeWidth={2} 
+                                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                </svg>
+                            </button>
+                          </div>
+                        
+                        </div>
+
                       </div>
-                      <div className='p-4 flex justify-end'>
-                        <button
-                          disabled={isSubmitting}
-                          type="submit"
-                          className='p-2 px-4 inline-flex text-xs leading-5 font-semibold rounded-lg text-green-50'
-                          style={{backgroundColor: '#45BF55'}}>
-                            <svg 
-                              className='w-6 h-6 text-white-500'
-                              xmlns="http://www.w3.org/2000/svg" 
-                              fill="none" 
-                              viewBox="0 0 24 24" 
-                              stroke="currentColor">
-                              <path 
-                                strokeLinecap="round" 
-                                strokeLinejoin="round" 
-                                strokeWidth={2} 
-                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                            </svg>
-                        </button>
-                      </div>
+                      
                     </form>
                   )}
                 </Formik>
+
                 <div className="m-4 shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
@@ -535,7 +564,8 @@ const CrearContratos: React.FC = () => {
                       })}
                     </tbody>
                   </table>
-                  <div className="bg-white w-full px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                  <div style={{display: detallesPaginate.length == 0 ? 'justify' : 'none' }} className="border-t border-gray-200 bg-gray-50 w-full px-4 py-3 flex justify-center text-gray-500">Sin datos</div>
+                  <div className="bg-gray-50 w-full px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
                     <div className="flex-1 flex justify-between sm:hidden">
                       <a className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:text-gray-500">
                         Anterior
@@ -590,12 +620,15 @@ const CrearContratos: React.FC = () => {
                     </div>
                   </div>
                 </div>
+              
               </div>
             </div>
           </div>
-          <div className='top-4 bg-gray-50 rounded-lg 0 relative' style={{zIndex:0}}>
+          
+          <div className='top-4 bg-gray-50 rounded-lg 0 relative' style={{zIndex:0, display:'flex', flexDirection:'column', justifyContent:'center'}}>
             <div className='px-2 absolute -top-3.5 py-1 left-2 rounded-lg text-gray-100' style={{backgroundColor: '#45BF55'}}>Ubicación
             </div>
+
             <Formik
               initialValues={{direccion: cliente.direccion}}
               validate={value => {
@@ -610,21 +643,21 @@ const CrearContratos: React.FC = () => {
 
                 return errors;
               }}
-              onSubmit={(values, {setSubmitting}:any) => {
+              onSubmit={() => {
                 
               }}>
               {
-                ({errors, handleChange, handleSubmit, values}) => (
-                <form onSubmit={handleSubmit}>
+                ({errors, handleChange, handleSubmit}) => (
+                <form onSubmit={handleSubmit} style={{zIndex:0, display: cliente.departamento ? 'block': 'none'}}>
                   <div className='mx-4 mt-6 mb-4'>
                     <div className="">
                       <span className="text-gray-700">Departamento</span>
-                      <select onChange={changeDepartamento} name='departamento' value={departamento.nombre}
+                      <select onChange={changeDepartamento} name='departamento' value={departamento?.nombre}
                           className="block w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                           {
                             departamentos.map((departamento: Departamento) => {
                               return (
-                                  <option key={generateUuid()} value={departamento.nombre}>{departamento.nombre}</option>
+                                <option key={generateUuid()} value={departamento.nombre}>{departamento.nombre}</option>
                               );
                             })
                           }
@@ -632,7 +665,7 @@ const CrearContratos: React.FC = () => {
                     </div>
                     <div className="my-2">
                       <span className="text-gray-700">Municipio</span>
-                      <select onChange={changeMunicipio} name='municipio' value={municipio.nombre}
+                      <select onChange={changeMunicipio} name='municipio' value={municipio?.nombre}
                           className="block w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
                           {
                             municipios.map((municipio: Municipio) => {
@@ -659,72 +692,46 @@ const CrearContratos: React.FC = () => {
                 </form>
               )}
             </Formik>            
+          
+            <div className="w-full text-center text-gray-500" style={{zIndex:0, display: cliente.departamento ? 'none' : 'block'}}>
+              Seleccione un cliente
+            </div>
+
           </div>
-          <div className='top-4 col-span-3 bg-gray-50 rounded-lg  relative' style={{zIndex:0}}>
+          
+          <div className='top-4 col-span-2 row-span-1 bg-gray-50 rounded-lg  relative' style={{zIndex:1}}>
             <div className='px-2 absolute -top-3.5 py-1 left-2 rounded-lg text-gray-100' style={{backgroundColor: '#45BF55'}}>Vehículo
             </div>
             <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
               <div className="p-2 align-middle min-w-full sm:px-6 lg:px-8">
-                <div className="flex">
-                  <div className="" style={{width: '25%'}}>
-                    <div className="mx-4 mt-6 mb-4">
-                      <div className=''>
-                        <span className="text-gray-700">Vehiculo</span>
-                        <select onChange={changeVehiculo} value={vehiculo.placa} name='vehiculo' className="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-                          {
-                            vehiculos.map((vehiculo: Vehiculo) => {
-                              return (
-                                <option key={generateUuid()} value={vehiculo.placa}>{vehiculo.placa}</option>
-                              );
-                            })
-                          }
-                        </select>
-                      </div>
+                
+                <div className="flex justify-end">
+
+                  <div className="w-30">
+                    <div className='mt-6 pr-4'>
+                      <button
+                        type='button'
+                        onClick={() => {setShowVehiculo(true);}}
+                        className='mt-1 p-2 px-4 w-full inline-flex leading-5 rounded-lg text-green-50 justify-center'
+                        style={{backgroundColor: '#45BF55'}}>
+                        <svg 
+                          className="w-6 h-6 text-white-500"
+                          xmlns="http://www.w3.org/2000/svg" 
+                          fill="none" 
+                          viewBox="0 0 24 24" 
+                          stroke="currentColor">
+                          <path 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round" 
+                            strokeWidth={2} 
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                      </button>
                     </div>
                   </div>
-                  <div className="" style={{width: '25%'}}>
-                    <div className="mx-4 mt-6 mb-4">
-                      <div className="">
-                        <span className="text-gray-700">Capacidad</span>
-                        <input value={vehiculo.capacidad} type="text" disabled placeholder="?" className="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"/>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="" style={{width: '25%'}}>
-                    <div className="mx-4 mt-6 mb-4">
-                      <div className="">
-                        <span className="text-gray-700">Tipo</span>
-                        <input value={vehiculo.tipo} type="text" disabled placeholder="?" className="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"/>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="" style={{width: '25%'}}>
-                    <div className="mx-4 mt-6 mb-4">
-                      <div className="">
-                        <span className="text-gray-700">Conductor</span>
-                        <input value={vehiculo.conductor.nombre} type="text" disabled placeholder="?" className="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"/>
-                      </div>
-                    </div>
-                  </div>
+
                 </div>
-                <div className='p-4 flex justify-end'>
-                  <button onClick={() => { addVehiculo(); }}
-                    className='p-2 px-4 inline-flex text-xs leading-5 font-semibold rounded-lg text-green-50'
-                    style={{backgroundColor: '#45BF55'}}>
-                      <svg 
-                        className='w-6 h-6 text-white-500'
-                        xmlns="http://www.w3.org/2000/svg" 
-                        fill="none" 
-                        viewBox="0 0 24 24" 
-                        stroke="currentColor">
-                        <path 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round" 
-                          strokeWidth={2} 
-                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                      </svg>
-                  </button>
-                </div>
+
                 <div className="m-4 shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
@@ -793,7 +800,8 @@ const CrearContratos: React.FC = () => {
                       })}
                     </tbody>
                 </table>
-                <div className="bg-white w-full px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                <div style={{display: vehiculosPaginate.length == 0 ? 'justify' : 'none' }} className="border-t border-gray-200 bg-gray-50 w-full px-4 py-3 flex justify-center text-gray-500">Sin datos</div>
+                <div className="bg-gray-50 w-full px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
                   <div className="flex-1 flex justify-between sm:hidden">
                     <a className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:text-gray-500">
                       Anterior
@@ -851,7 +859,8 @@ const CrearContratos: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className='col-span-3 flex justify-end'>
+        
+          <div className='col-span-3 flex justify-end'>
             <button onClick={() => {
               save();
             }}
@@ -862,7 +871,9 @@ const CrearContratos: React.FC = () => {
               style={{backgroundColor: '#E15252'}}>Cancelar
             </button>
           </div>
+        
         </div>
+      
       </div>
     </div>
   );

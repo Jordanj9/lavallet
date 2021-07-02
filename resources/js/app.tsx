@@ -1,48 +1,18 @@
-require('./bootstrap');
-
-import React from 'react';
-import ReactDOM from 'react-dom';
-import {BrowserRouter as Router,
-  Switch,
-  Route
-} from "react-router-dom";
-
-import Sidebar from "./components/Sidebar";
-import Contratacion from "./modules/contratacion";
-import Generales from "./modules/generales";
-import Reportes from './modules/reportes';
-import Transito from "./modules/transito";
-import Usuario from './modules/usuario';
+import React from "react";
+import ReactDOM from "react-dom";
+import { Provider } from "react-redux";
+import Routes from "./components/Routes";
+import { store } from "./redux/store";
+import "./authAxios";
 
 const Root = () => {
   return (
-    <Router>
-      <div className='flex'>
-        <Sidebar/>
-        <div className='ml-auto w-10/12'>
-          <Switch>
-            <Route path='/usuario'>
-              <Usuario/>
-            </Route>
-            <Route path='/contratacion'>
-              <Contratacion/>
-            </Route>
-            <Route path='/generales'>
-              <Generales/>
-            </Route>
-            <Route path='/transito'>
-              <Transito/>
-            </Route>
-            <Route path='/reportes'>
-              <Reportes/>
-            </Route>
-          </Switch>
-        </div>
-      </div>
-    </Router>
+    <Provider store={store}>
+      <Routes />
+    </Provider>
   );
-}
+};
 
-if (document.getElementById('root')) {
-  ReactDOM.render(<Root/>, document.getElementById('root'));
+if (document.getElementById("root")) {
+  ReactDOM.render(<Root />, document.getElementById("root"));
 }
