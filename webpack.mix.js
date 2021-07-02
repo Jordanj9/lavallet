@@ -1,4 +1,4 @@
-const mix = require('laravel-mix');
+const mix = require("laravel-mix");
 
 /*
  |--------------------------------------------------------------------------
@@ -11,30 +11,30 @@ const mix = require('laravel-mix');
  |
  */
 
-
-mix.ts('resources/js/app.tsx', 'public/js')
+mix.ts("resources/js/app.tsx", "public/js")
     .postCss("resources/css/app.css", "public/css", [
         require("tailwindcss"),
         require("autoprefixer")
-    ]).webpackConfig({
-    module: {
-        rules: [
-            {
-                test: /(\.(png|jpe?g|gif|webp)$|^((?!font).)*\.svg$)/,
-                loaders: {
-                    loader: 'file-loader',
-                    options: {
-                        name: '[path][name].[ext]?[hash]',
-                        context: 'resources/assets',
+    ])
+    .webpackConfig({
+        module: {
+            rules: [
+                {
+                    test: /(\.(png|jpe?g|gif|webp)$|^((?!font).)*\.svg$)/,
+                    loaders: {
+                        loader: "file-loader",
+                        options: {
+                            name: "[path][name].[ext]?[hash]",
+                            context: "resources/assets"
+                        }
                     }
-                },
-            }
-        ]
-   }
-});
+                }
+            ]
+        }
+    });
 
 mix.browserSync({
-    proxy: 'http://127.0.0.1:8000/',
+    proxy: "http://127.0.0.1:8000/"
 });
 
 mix.disableNotifications();
