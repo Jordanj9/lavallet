@@ -1,0 +1,45 @@
+version: '3.8'
+services: 
+  nginx:
+    image: nginx:alpine
+    container_name: lavallet-nginx
+    restart: unless-stopped
+    ports:
+      - 8000:80
+    volumes:
+      - ./:/var/www
+      - ./docker-compose/nginx:/etc/nginx/conf.d/
+    networks: 
+      - lavallet 
+  app:
+    build:
+      args:
+         user:  lavallet 
+         uid: 1000
+      context: ./
+      dockerfile: Dockerfile
+    image:  lavallet 
+    container_name: lavallet-app
+    restart: unless-stopped
+    working_dir: /var/www/
+    volumes:
+      - ./:/var/www
+    networks:
+      - lavallet 
+  mysql:
+    image: mysql:5.7
+    container_name: lavallet-db
+    restart: unless-stopped
+    environment: 
+      MYSQL_DATABASE: lavallet 
+      MYSQL_USER: lavallet 
+      MYSQL_PASSWORD: secret 
+      MYSQL_ROOT_PASSWORD: admin.root
+    ports:
+      - 33068:3306
+    volumes:
+      - ./docker-compose/mysql:/var/lib/mysql
+    networks:
+      - lavallet 
+networks:
+    lavallet:
