@@ -6,6 +6,11 @@ export default class VehiculoService {
 
   getVehiculos = async (): Promise<{status:number, data:Vehiculo[], mensaje:string, length:number}> => {
     return await VehiculoRepository.getAll();
+  }  
+
+  find = async (key:string): Promise<{status:number, mensaje:string, data:Vehiculo[], length:number}> => {
+    //CAMBIAR POR RUTA DE BUSQUEDA POR ID
+    return await VehiculoRepository.getAll();
   }
 
   getPaginate = async (limit:number, offset:number): Promise<{status:number, data:Vehiculo[], mensaje:string, length:number}> => {

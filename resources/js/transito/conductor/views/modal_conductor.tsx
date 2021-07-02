@@ -1,14 +1,9 @@
-import React,{useState} from "react";
+import React,{useEffect, useRef, useState} from "react";
 import {Conductor} from "../domain/conductor";
 import ConductorService from "../application/ConductorService";
-import {Formik}  from 'formik';
+import {Formik, FormikProps, FormikValues}  from 'formik';
 import Toast from "../../shared/views/toast";
-import { stringify } from "uuid";
 
-enum STATUS  {
-  OK = 200,
-  CREATED = 201
-}
 const ModalConductor : React.FC<{
   show: boolean;
   hidden: any;
@@ -20,6 +15,13 @@ const ModalConductor : React.FC<{
   const [showModalRequest, setShowModalRequest] = useState(false);
   const [warning, setWarning] = useState(false);
   const [message, setMessage] = useState('');
+
+  const formikRef = useRef<FormikProps<Conductor>>(null);
+  
+  useEffect(() => {
+     if(formikRef.current !== null)
+        formikRef.current.setValues(conductor);
+  },[conductor]);
   
   async function save(_conductor:Conductor) {
     if(_conductor.id != ""){ 
@@ -53,19 +55,16 @@ const ModalConductor : React.FC<{
 
   return(
     <Formik
+      innerRef={formikRef}
       initialValues={conductor}
       validate={value => {
         const errors:any = {};
-
-        setConductor(value);
-
         if(!value.identificacion)
           errors.identificacion = "Este campo es obligatorio";
         if(!value.nombre)
           errors.nombre = "Este campo es obligatorio";
         if(!value.telefono)
           errors.telefono = "Este campo es obligatorio";
-
         return errors;
       }}
       onSubmit={(values, {setSubmitting}:any) => {
@@ -123,7 +122,6 @@ const ModalConductor : React.FC<{
         </form>
       )}
     </Formik>
-    
   );
 }
 export default ModalConductor;

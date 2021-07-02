@@ -90,13 +90,13 @@ final class Utils
     }
 
     public static function take(array $collection, int $limit = 10,int $offset = 0) : array{
-      $array = [];
-      $size = count($collection);
-      if($size === 0)
+        $array = [];
+        $size = count($collection);
+        if($size === 0)
+          return $array;
+        $offset = $offset <= $size ? $offset : $offset % $size;
+        $array = array_slice($collection,$offset - 1,$limit); 
         return $array;
-      $offset = $offset <= $size ? $offset : $offset % $size;
-      $array = array_slice($collection,$offset - 1,$limit); 
-      return $array;
     }
 
 } 

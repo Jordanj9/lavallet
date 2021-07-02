@@ -1,7 +1,7 @@
-import React, {useState} from "react";
+import React, {useState, useEffect, useRef} from "react";
 import {Material} from "../domain/material";
 import MaterialService from "../application/MaterialService";
-import {Formik}  from 'formik';
+import {Formik, FormikProps}  from 'formik';
 import Toast from "../../shared/views/toast";
 
 const ModalMaterial: React.FC<{
@@ -15,9 +15,12 @@ const ModalMaterial: React.FC<{
   const [warning, setWarning] = useState(false);
   const [message, setMessage] = useState('');
 
-  function hiddenModal(): void {
-    setShowModal(false);
-  }
+   const formikRef = useRef<FormikProps<Material>>(null);
+  
+    useEffect(() => {
+       if(formikRef.current !== null)
+          formikRef.current.setValues(oldMaterial);
+    },[oldMaterial]);
 
   async function saveOrUpdate(value:Material) {
     if(oldMaterial.id != ""){
@@ -67,7 +70,7 @@ const ModalMaterial: React.FC<{
         ({errors, handleChange, handleSubmit, values, setValues, isSubmitting, handleReset}) => (
         <form onSubmit={handleSubmit}>
           <Toast show={showModal} setShow={setShowModal} message={message} warning={warning}/>
-          <div className={show ? 'block' : 'hidden'} onMouseEnter={(e:any) => { handleReset(e); oldMaterial.vacio ?? setValues(oldMaterial)}}>
+          <div className={show ? 'block' : 'hidden'} >
             <div className='z-100 fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-40' 
               onClick={(e:any) => { handleReset(e); hidden() }}
               style={{zIndex: 1000}}>

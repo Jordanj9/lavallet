@@ -12,6 +12,10 @@ class ConsultarClientesGetController extends Controller
 {
     private ConsultarClientesByStringService $service;
 
+    /**
+     * ConsultarClientesGetController constructor.
+     * @param ConsultarClientesByStringService $service
+     */
     public function __construct(ConsultarClientesByStringService $service)
     {
         $this->service = $service;
@@ -20,6 +24,7 @@ class ConsultarClientesGetController extends Controller
     public function __invoke(string $request)
     {
         $clientes = $this->service->__invoke(strtoupper($request));
+
         return map(function ($item) {
             return [
                 'id' => $item->id()->value(), 'identificacion' => $item->identificacion()->value(),

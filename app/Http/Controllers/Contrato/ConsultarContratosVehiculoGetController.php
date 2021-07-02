@@ -40,7 +40,7 @@ class ConsultarContratosVehiculoGetController extends Controller
             if (count($data) > 0) {
                 return response()->json(['data' => $data, 'mensaje' => 'Datos encontrados'], Response::HTTP_OK);
             } else {
-                return response()->json(['data' => '', 'mensaje' => 'No hay registros.'], Response::HTTP_OK);
+                return response()->json(['data' => [], 'mensaje' => 'No hay registros.'], Response::HTTP_OK);
             }
         } catch (VehiculoSinContratoException | VehiculoNoExiste $exception) {
             return response()->json(['data' => null, 'mensaje' => $exception->getMessage()], Response::HTTP_BAD_REQUEST);

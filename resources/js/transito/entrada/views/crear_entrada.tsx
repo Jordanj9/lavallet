@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Contrato } from "../../contrato/domain/contrato";
 import { Detalle } from "../../contrato/domain/detalle";
-import ListarContratos from "../../contrato/views/list_contrato";
 import ListarDetalles from "../../contrato/views/list_detalle";
 import { Ticket } from "../../ticket/domain/ticket";
 import TicketService from "../../ticket/application/TicketService";
@@ -12,33 +11,16 @@ import { Vale } from "../../vale/domain/vale";
 import ModalEntrada from "./modal_entrada";
 import { VehiculoDTO } from "../../vehiculo/application/VehiculoDTO";
 import ListarContratosEntrada from "../../contrato/views/list_contrato_entrada";
+import {Camara} from "../../entrada/views/camara_component";
+import {takePhoto} from "../../entrada/views/camara_component";
 import ContratoService from "../../contrato/application/ContratoService";
 import Preview from "../../shared/views/preview";
 import { Imprimible } from "../../salida/domain/imprimible";
 import Spinner from "../../shared/views/spinner";
-import axios from "axios";
-import ReactDOM from "react-dom";
 
 let pc: RTCPeerConnection;
 let videoRef: any;
 
-let doSignaling = (iceRestart: any) => {
-  pc.createOffer({ iceRestart })
-    .then(offer => {
-      pc.setLocalDescription(offer);
-      return axios.post(
-        `http://localhost:8080/doSignaling`,
-        JSON.stringify(offer)
-      );
-    })
-    .then(res => res.data)
-    .then(res => {
-      pc.setRemoteDescription(res);
-    })
-    .catch(err => {
-      //to do anything...
-    });
-};
 
 const CrearEntrada: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -66,37 +48,11 @@ const CrearEntrada: React.FC = () => {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    pc = new RTCPeerConnection();
-    pc.addTransceiver("video");
-
-    pc.oniceconnectionstatechange = () => {};
-    pc.ontrack = function(event) {
-      let el = document.createElement("video") as HTMLVideoElement;
-      el.srcObject = event.streams[0];
-      el.autoplay = true;
-      el.controls = true;
-      const rootElement = document.getElementById("remoteVideos");
-      ReactDOM.render(
-        <video
-          ref={audio => {
-            videoRef = audio;
-          }}
-          controls={true}
-          autoPlay={true}
-          style={{ height: 200 }}
-        ></video>,
-        rootElement
-      );
-      videoRef.srcObject = event.streams[0];
-    };
-    doSignaling(false);
-  },[]);
-
-  useEffect(() => {
     setContratos([]);
     if (pista != "") {
       setLoading(true);
       contratoService.getByPlaca(pista).then(value => {
+        console.log(value);
         if (value.data != null) {
           setContratos(value.data);
           if (value.data.length > 0) {
@@ -110,6 +66,8 @@ const CrearEntrada: React.FC = () => {
           setContratos([]);
           setContrato(new Contrato());
         }
+        setLoading(false);
+      }).catch(error => {
         setLoading(false);
       });
     }
@@ -391,14 +349,9 @@ const CrearEntrada: React.FC = () => {
           <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div className="p-2 align-middle min-w-full sm:px-6 lg:px-8">
               <div
-                style={{
-                  position: "absolute",
-                  left: "50%",
-                  top: "50%",
-                  transform: "translate(-50%, -50%)"
-                }}
+
               >
-                <div id="remoteVideos"></div>
+                <Camara></Camara>
               </div>
             </div>
           </div>
@@ -489,6 +442,7 @@ const CrearEntrada: React.FC = () => {
         <button
           onClick={() => {
             preview();
+            takePhoto();
           }}
           className="px-8 py-3 | mr-4 | inline-flex text-sm md: leading-5 font-semibold rounded-lg text-green-50"
           style={{ backgroundColor: "#45BF55" }}

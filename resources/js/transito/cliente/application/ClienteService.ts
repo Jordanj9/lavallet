@@ -8,6 +8,11 @@ export default class ClienteService {
     return await ClienteRepository.getAll();
   }
 
+  find = async (id:string): Promise<{status:number, mensaje:string, data:Cliente[], length:number}> => {
+    //CAMBIAR POR RUTA DE BUSQUEDA POR ID
+    return await ClienteRepository.getAll();
+  }
+
   getPaginate = async (limit:number, offset:number): Promise<{status:number, mensaje:string, data:Cliente[], length:number}> => {
     return await ClienteRepository.getPaginate(limit, offset);
   }
@@ -19,10 +24,6 @@ export default class ClienteService {
 
   update = async (cliente: Cliente) => {
     return await ClienteRepository.update(cliente);
-  }
-
-  get = async (id: string) => {
-    return await ClienteRepository.get(id);
   }
 
   delete = async (id: string) => {

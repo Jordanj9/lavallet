@@ -38,7 +38,7 @@ class ClienteGetAllTest extends TestCase
         factory(ClienteModel::class, 10)->create();
         $response = $this->get('/api/cliente?limit=2');
         $response->assertStatus(200);
-        $response->assertJsonCount(2,'data');
+        $response->assertJsonCount(1,'data');
     }
 
     public function testCustomerGetAllWithOffset(): void
@@ -46,7 +46,7 @@ class ClienteGetAllTest extends TestCase
         factory(ClienteModel::class, 10)->create();
         $response = $this->get('/api/cliente?offset=2');
         $response->assertStatus(200);
-        $response->assertJsonCount(8, 'data');
+        $response->assertJsonCount(9, 'data');
     }
 
     public function testCustomerGetAllWithOffsetAndLimit(): void
@@ -54,7 +54,7 @@ class ClienteGetAllTest extends TestCase
         factory(ClienteModel::class, 10)->create();
         $response = $this->get('/api/cliente?limit=20&offset=2');
         $response->assertStatus(200);
-        $response->assertJsonCount(8, 'data');
+        $response->assertJsonCount(9, 'data');
     }
 
 }
